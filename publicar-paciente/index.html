@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<!-- Sin red: ninguna conexión saliente ni formularios con destino externo -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src data:; connect-src 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'">
+<title>Cuestionario de autoinforme</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header class="site-header">
+  <div class="site-header__in">
+    <p class="brand">Cuestionario de autoinforme</p>
+    <button class="btn btn--ghost" type="button" id="btn-salir">Salir y borrar mis respuestas</button>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+  <div id="live" class="sr-only" role="status" aria-live="polite"></div>
+
+  <div id="error-fatal" class="alert" role="alert" hidden>
+    <strong>No se pudo cargar el cuestionario.</strong>
+    <span id="error-fatal-txt">Faltan archivos de la carpeta. Pide ayuda a tu profesional.</span>
+  </div>
+
+  <div id="aviso-retomar" class="alert alert--info" hidden>
+    <strong id="aviso-retomar-txt"></strong>
+  </div>
+  <div id="aviso-borrado" class="alert alert--info" role="status" hidden>
+    <strong>Listo.</strong> Se borraron tus respuestas y tus datos de este dispositivo.
+  </div>
+  <div id="aviso-memoria" class="alert" role="note" hidden>
+    <strong>Este navegador no permite guardar tu avance.</strong>
+    Si cierras la página, tendrás que empezar de nuevo. Evita cerrarla hasta terminar.
+  </div>
+
+  <!-- 1. CONSENTIMIENTO -->
+  <section id="consentimiento" data-pantalla hidden aria-labelledby="t-cons">
+    <h1 id="t-cons" tabindex="-1">Antes de comenzar</h1>
+    <p>Vas a responder el Inventario Clínico Multiaxial de Millon (MCMI-III), una lista de 175 afirmaciones que respondes con <strong>Verdadero</strong> o <strong>Falso</strong>. Toma aproximadamente de 25 a 40 minutos.</p>
+
+    <div class="card card--accent">
+      <h2>Para qué sirve</h2>
+      <p>Tus respuestas ayudan a tu psicoterapeuta a conocerte mejor y a orientar el trabajo que harán juntos. No hay respuestas correctas ni incorrectas.</p>
+      <h2>Quién verá los resultados</h2>
+      <p>Solo tu psicoterapeuta. Esta página no te mostrará puntajes ni interpretaciones: el análisis corresponde a tu profesional.</p>
+      <h2>Dónde se guardan tus datos</h2>
+      <p>Únicamente en este dispositivo y en este navegador. No se envían a ningún servidor. Ten en cuenta sus límites: si usas un equipo compartido, otra persona con acceso a él podría retomar tu sesión; y si borras los datos del navegador, perderás tu avance. Puedes borrar todo en cualquier momento con el botón “Salir y borrar mis respuestas”.</p>
+      <h2>Tu derecho a parar</h2>
+      <p>Puedes pausar y continuar después, o abandonar el cuestionario cuando quieras, sin dar explicaciones.</p>
+    </div>
+
+    <div class="alert alert--info" role="note">
+      <strong>Aviso profesional.</strong> Este instrumento requiere licencia de uso y debe aplicarse bajo la supervisión de un profesional habilitado. Esta herramienta es de uso académico y no emite diagnósticos.
+    </div>
+
+    <div class="check">
+      <input type="checkbox" id="acepto" aria-describedby="err-acepto">
+      <label for="acepto">He leído la información anterior y acepto responder el cuestionario de forma voluntaria.</label>
+    </div>
+    <p id="err-acepto" class="field-error" hidden>Para continuar, marca la casilla de aceptación. Si prefieres no hacerlo, puedes cerrar esta página.</p>
+    <div class="btn-row">
+      <span></span>
+      <button class="btn" type="button" id="btn-consent">Continuar</button>
+    </div>
+  </section>
+
+  <!-- 2. IDENTIFICACIÓN -->
+  <section id="identificacion" data-pantalla hidden aria-labelledby="t-id">
+    <h1 id="t-id" tabindex="-1">Tus datos de identificación</h1>
+    <p>Usaremos solo lo necesario para que tu psicoterapeuta ubique tus respuestas. No escribas diagnósticos ni datos médicos.</p>
+    <form id="form-ident" novalidate>
+      <label for="codigo">Iniciales o código
+        <span class="hint">Por ejemplo, las iniciales de tu nombre, o el código que te dio tu psicoterapeuta (letras, números, guion).</span></label>
+      <input type="text" id="codigo" name="codigo" autocomplete="off" maxlength="20" aria-describedby="err-codigo">
+      <p id="err-codigo" class="field-error" hidden>Escribe tus iniciales o el código que te dieron (hasta 20 caracteres, sin espacios).</p>
+
+      <label for="edad">Edad
+        <span class="hint">En años cumplidos. Este cuestionario es para personas de 18 años o más.</span></label>
+      <input type="number" id="edad" name="edad" inputmode="numeric" min="18" max="99" aria-describedby="err-edad">
+      <p id="err-edad" class="field-error" hidden>Escribe tu edad con números, entre 18 y 99. Si tienes menos de 18, consulta primero con tu profesional.</p>
+
+      <label for="fecha">Fecha de aplicación
+        <span class="hint">Se completa automáticamente.</span></label>
+      <input type="text" id="fecha" name="fecha" readonly>
+    </form>
+    <div class="btn-row">
+      <button class="btn btn--ghost" type="button" id="btn-id-atras">Anterior</button>
+      <button class="btn" type="button" id="btn-id-sig">Comenzar</button>
+    </div>
+  </section>
+
+  <!-- 3. CUESTIONARIO (bloques) -->
+  <section id="cuestionario" data-pantalla hidden aria-labelledby="t-bloque">
+    <div class="progress">
+      <div class="progress__meta">
+        <h1 id="t-bloque" class="progress__t" tabindex="-1"></h1>
+        <span id="prog-txt"></span>
+      </div>
+      <div class="progress__bar" id="prog-bar" role="progressbar" aria-label="Avance del cuestionario" aria-valuemin="0" aria-valuemax="175" aria-valuenow="0"><span></span></div>
+    </div>
+    <p class="muted">Lee cada afirmación y elige <strong>Verdadero</strong> si es verdadera o casi siempre verdadera para ti, o <strong>Falso</strong> si es falsa o casi siempre falsa. Intenta responder todas, aunque no estés seguro; si no logras decidirte, elige Falso.</p>
+    <div id="aviso-bloque" class="alert" role="alert" hidden><strong id="aviso-bloque-txt"></strong> <span id="aviso-bloque-sub"></span></div>
+    <form id="form-items" novalidate></form>
+    <div class="btn-row">
+      <button class="btn btn--ghost" type="button" id="btn-ant">Anterior</button>
+      <button class="btn" type="button" id="btn-sig">Siguiente</button>
+    </div>
+    <p class="muted small">Tu avance se guarda automáticamente en este dispositivo.</p>
+  </section>
+
+  <!-- 4. REVISIÓN -->
+  <section id="revision" data-pantalla hidden aria-labelledby="t-rev">
+    <h1 id="t-rev" tabindex="-1">Revisa tus respuestas</h1>
+    <div class="progress">
+      <div class="progress__meta"><span id="rev-txt"></span><span id="rev-falta"></span></div>
+      <div class="progress__bar" id="rev-bar" role="progressbar" aria-label="Avance del cuestionario" aria-valuemin="0" aria-valuemax="175" aria-valuenow="0"><span></span></div>
+    </div>
+    <p>Puedes volver a cualquier bloque para cambiar una respuesta. Para enviar, todas las afirmaciones deben estar respondidas.</p>
+    <div id="aviso-rev" class="alert" role="alert" hidden><strong id="aviso-rev-txt"></strong></div>
+    <ul class="rev" id="lista-rev"></ul>
+    <div class="btn-row">
+      <button class="btn btn--ghost" type="button" id="btn-rev-volver">Volver al cuestionario</button>
+      <button class="btn" type="button" id="btn-enviar">Enviar respuestas</button>
+    </div>
+  </section>
+
+  <!-- 5. CIERRE (neutro: sin ningún indicador de resultado) -->
+  <section id="cierre" data-pantalla hidden aria-labelledby="t-cierre">
+    <h1 id="t-cierre" tabindex="-1">Gracias</h1>
+    <div class="card card--accent">
+      <p><strong>Gracias. Tus respuestas fueron registradas. El análisis corresponde a tu profesional.</strong></p>
+    </div>
+    <div class="card">
+      <h2>Archivo para tu profesional</h2>
+      <p>Si tu profesional te pidió un archivo con tus respuestas, descárgalo y entrégaselo por el medio que él o ella te indique. El archivo no contiene resultados, solo tus respuestas.</p>
+      <label for="clave-arch">Clave de protección (opcional)
+        <span class="hint">Úsala solo si tu profesional te la indicó. Si la escribes, el archivo se protege con ella; no la olvides, porque no se puede recuperar.</span></label>
+      <input type="password" id="clave-arch" autocomplete="off">
+      <p id="msg-arch" class="muted small" role="status"></p>
+      <div class="btn-row"><span></span><button class="btn" type="button" id="btn-descargar">Descargar archivo de respuestas</button></div>
+    </div>
+    <p class="muted">Puedes cerrar esta página. Si usas un equipo que no es tuyo, pulsa el botón de abajo para borrar tus respuestas de este dispositivo.</p>
+    <div class="btn-row"><span></span><button class="btn btn--ghost" type="button" id="btn-salir-2">Salir y borrar mis respuestas</button></div>
+  </section>
+</main>
+
+<!-- Confirmación de borrado -->
+<dialog id="dlg-borrar" aria-labelledby="dlg-t">
+  <form method="dialog">
+    <h2 id="dlg-t">¿Borrar tus respuestas?</h2>
+    <p>Se eliminarán de este dispositivo todas tus respuestas y tus datos. Esta acción no se puede deshacer. Si ya descargaste el archivo para tu profesional, ese archivo no se borra.</p>
+    <div class="btn-row">
+      <button class="btn btn--ghost" value="cancelar" autofocus>Cancelar</button>
+      <button class="btn" value="borrar" id="dlg-ok">Sí, borrar todo</button>
+    </div>
+  </form>
+</dialog>
+
+<noscript>
+  <div class="alert"><strong>Se necesita JavaScript.</strong> Activa JavaScript en tu navegador para responder el cuestionario. No se envía nada por internet.</div>
+</noscript>
+
+<script src="data/items.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
